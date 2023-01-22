@@ -31,11 +31,21 @@
 }
 .container{
     display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
+    /* justify-content: space-around; */
+    flex-wrap:nowrap;
     align-items: center;
+    overflow-y: auto;
+
 }
+/* .cards{
+    display: flex;
+    justify-content: space-around;
+    flex-wrap:nowrap;
+    align-items: center;
+
+} */
 .card{
+
     width: 300px;
     height: 400px;
     background-color: rgb(255, 255, 255);
@@ -46,7 +56,15 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    margin: 20px;
+    margin: 40px 50px;
+}
+.thumbnail{
+    width: 300px;
+    height: auto;
+}
+.description, .title, .channel, .date{
+    font-size: 12px;
+    margin: 5px;
 }
 .info{
     display: flex;
