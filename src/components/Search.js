@@ -3,51 +3,65 @@ import { useState } from "react";
 import axios from "axios";
 import {FaSearch} from 'react-icons/fa'
 import Card from "./Card";
+import style from '../components/style.css';
 
 const Search=()=>{
     const [search, setSearch]=useState("")
     const [videosData, setData]=useState([])
     const [maxResults, setMaxResults]=useState(3)
-    const key = 'AIzaSyB_-yKfl2GSdtMzIl70COgvbcYUga9sBLc'
-    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${search}&type=video&key=${key}&maxResults=${maxResults}`
+    const [nextPageToken, setPageToken]=useState("")
+    const [fetching, setFetching]=useState(true)
+    const key = 'AIzaSyBta9bCtddYGoFYbJGwVf2LeX-3RBF6djU'
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${search}&type=video&key=${key}&maxResults=${maxResults}&order=relevance&pageToken=${nextPageToken}`
 
-   
-    const more =()=>{
-        setMaxResults(maxResults=>maxResults+3)
+    const getVideos=()=>{
         axios.get(url)
         .then(res => {
           setData(res.data.items)
-          console.log(maxResults)
-          console.log(res.data.items)
-        })
+          setPageToken(nextPageToken => nextPageToken=res.data.nextPageToken)
+          console.log(res.data.nextPageToken)
+       })
         .catch(err=>console.log(err))
     }
+    //.then(res => setBooks(books.concat(<div className="main">{<Card book={res.data.items}/>}</div>)))
+    const nextPage =()=>{
+      axios.get(url)
+      .then(res => {
+        setData(res.data.items)
+        setPageToken(nextPageToken => nextPageToken=res.data.nextPageToken)
+      })
+      .catch(err=>console.log(err))
+  }
+    
 
-
-    const handleSubmit = event => {
-        event.preventDefault();
-
-        setMaxResults(maxResults=>maxResults=6)
-
-        axios.get(url)
-        .then(res => {
-          setData(res.data.items)
-          console.log(res.data.items)
-        })
-        .catch(err=>console.log(err))
+    const handleSubmit = e => {
+        e.preventDefault();
+        getVideos()
       }
 
-      useEffect(()=>{
-        document.addEventListener('scroll', scrollHandler)
-        return function(){
-            document.removeEventListener('scroll', scrollHandler)
-        }
-      }, [])
-    
-      const scrollHandler =(e)=>{
-        console.log('scroll')
+    const searchVideos = e => {
+        if(e.key === 'Enter'){
+          getVideos()
       }
+    }
+
+    const initialState = {
+      pagesCount: 12,
+      pages: [],
+      currentPage: 1,
+      pagesLength: 3
+    }
+    for(let i = initialState.currentPage; i <= initialState.pagesLength; i++){
+      initialState.pages.push(i)
+  }
+
+    const pageButtons = () =>{
+      
+    }
     
+
+      
+
     return(
         <div>
         <div className="header">
@@ -57,15 +71,23 @@ const Search=()=>{
                     onChange={e=>{
                         setMaxResults(3)
                         setSearch(e.target.value)}}
+                    onKeyDown={searchVideos}
                      />
                     <button onClick={handleSubmit} className="faSearch"><FaSearch/></button>
-                    <button onClick={more} className="faSearch">more</button>
-
                 </div>
             </div>
             <div className="cards">
                 {
                     <Card video={videosData}/>
+                }
+            </div>
+            <div className="scrollButtons">
+            {
+                  initialState.pages.map(page=>{
+                    return <button onClick={nextPage} 
+                    //className={initialState.currentPage === page && style.selectedPage}
+                    >{page}</button>
+                  })
                 }
             </div>
         </div>
